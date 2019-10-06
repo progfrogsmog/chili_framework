@@ -229,6 +229,9 @@
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\Surface\Engine\dib.bmp" />
+    <Image Include="..\..\..\Surface\Engine\dib32.bmp" />
+    <Image Include="..\..\..\Surface\Engine\dibr.bmp" />
     <Image Include="Chili.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

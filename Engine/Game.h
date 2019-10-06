@@ -43,6 +43,6 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-	Surface surf = ("dib.bmp");
+	Surface surf = ("dib32.bmp");
 	/********************************/
 };
