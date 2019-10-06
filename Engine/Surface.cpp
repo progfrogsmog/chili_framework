@@ -111,4 +111,4 @@ Color Surface::GetPixel(int x, int y) const
 {
 	return pPixel[x + y * width];
 }
-//endofuki
+//endofukiasda
