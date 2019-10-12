@@ -25,18 +25,21 @@ Surface::Surface(int width, int height)
 
 Surface::Surface(const std::string filename)
 {
-	std::ifstream file("dib.bmp", std::ios::binary);
+	/* OPEN FILE TO READ */
+	std::ifstream file(filename, std::ios::binary);
 	assert(file);
 
+	/* READ INFO FROM FILE */
 	BITMAPFILEHEADER bmFileHeader;
 	file.read(reinterpret_cast<char*>(&bmFileHeader), sizeof(bmFileHeader));
 
 	BITMAPINFOHEADER bmInfoHeader;
 	file.read(reinterpret_cast<char*>(&bmInfoHeader), sizeof(bmInfoHeader));
 
-	assert(bmInfoHeader.biBitCount == 24);
+	assert(bmInfoHeader.biBitCount == 24 || bmInfoHeader.biBitCount == 32);
 	assert(bmInfoHeader.biCompression == BI_RGB);
 
+	/* GET DIMENSIONS OPERATION */
 	int yStart;
 	int yEnd;
 	int dy;
@@ -55,19 +58,27 @@ Surface::Surface(const std::string filename)
 		dy = -1;
 	}
 	width = bmInfoHeader.biWidth;
-
 	pPixel = new Color[width * height];
+
+	/* DRAW BITMAP DEPENDENT ON FORMAT */
 	file.seekg(bmFileHeader.bfOffBits);
+	const int padding = (4 - (3 * width % 4)) % 4; //FOR PADDING SPACE AT THE END OF SINGLE ROW
+	bool is32 = bmInfoHeader.biBitCount == 32;
 
-	const int padding = (4 - (3 * width % 4)) % 4; //FOR PADDING SPACE AT THE END OF SINGLE ROWlkj
-
-	for (int y = yStart - 1; y >= 0; y--)
+	for (int y = yStart; y != yEnd; y += dy)//IMPORTANT: MUST BE != BECAUSE CAN BE < or > dependent on height
 	{
 		for (int x = 0; x < width; x++)
 		{
 			PutPixel(x, y, Color(file.get(), file.get(), file.get()));
+			if (is32)
+			{
+				file.seekg(1,std::ios::cur);//file.get() works also
+			}
 		}
-		file.seekg(padding, std::ios::cur);
+		if (!is32)
+		{
+			file.seekg(padding, std::ios::cur);
+		}
 	}
 }
 
@@ -111,4 +122,3 @@ Color Surface::GetPixel(int x, int y) const
 {
 	return pPixel[x + y * width];
 }
-//endofuki
