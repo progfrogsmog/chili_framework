@@ -253,6 +253,11 @@ Graphics::~Graphics()
 	if (pImmediateContext) pImmediateContext->ClearState();
 }
 
+const RectI& Graphics::GetDimensions()
+{
+	return {0, ScreenWidth, 0, ScreenHeight};
+}
+
 void Graphics::EndFrame()
 {
 	HRESULT hr;
@@ -317,13 +322,92 @@ void Graphics::PutPixel(int x, int y, Color c)
 	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
 }
 
-void Graphics::DrawSprite(int x, int y, const Surface& s)
+void Graphics::DrawSpriteNoneChromo(int x, int y, const Surface& s)
 {
-	for (int sy = 0; sy < s.GetHeight(); sy++)
+	DrawSpriteNoneChromo(x, y, s.GetRect(), s);
+}
+
+void Graphics::DrawSpriteNoneChromo(int x, int y, RectI src, const Surface& s)
+{
+	DrawSpriteNoneChromo(x, y, s.GetRect(), GetDimensions(), s);
+}
+
+void Graphics::DrawSpriteNoneChromo(int x, int y, RectI src, const RectI clip, const Surface& s)
+{	
+	assert(src.left >= 0);
+	assert(src.right <= s.GetWidth());
+	assert(src.top >= 0);
+	assert(src.bottom <= s.GetHeight());
+	if (x + src.GetWidth() > clip.right)
 	{
-		for (int sx = 0; sx < s.GetWidth(); sx++)
+		src.right -= x + src.GetWidth() - clip.right;
+	}
+	if (y + src.GetHeight() > clip.bottom)
+	{
+		src.bottom -= y + src.GetHeight() - clip.bottom;
+	}
+	if (x < clip.left)
+	{
+		src.left += clip.left - x;
+		x = clip.left;
+	}
+	if (y < clip.top)
+	{
+		src.top += clip.top - y;
+		y = clip.top;
+	}
+	for (int sy = src.top; sy < src.bottom; sy++)
+	{
+		for (int sx = src.left; sx < src.right; sx++)
 		{
-			PutPixel(x + sx, y + sy, s.GetPixel(sx, sy));
+			PutPixel(x + sx - src.left, y + sy - src.top, s.GetPixel(sx, sy));
+		}
+	}
+}
+
+void Graphics::DrawSprite(int x, int y, const Surface& s, Color chroma)
+{
+	DrawSprite(x, y, s.GetRect(), s, chroma);
+}
+
+void Graphics::DrawSprite(int x, int y, RectI src, const Surface& s, Color chroma)
+{
+	DrawSprite(x, y, s.GetRect(), GetDimensions(), s, chroma);
+}
+
+void Graphics::DrawSprite(int x, int y, RectI src, const RectI clip, const Surface& s, Color chroma)
+{
+	assert(src.left >= 0);
+	assert(src.right <= s.GetWidth());
+	assert(src.top >= 0);
+	assert(src.bottom <= s.GetHeight());
+	if (x + src.GetWidth() > clip.right)
+	{
+		src.right -= x + src.GetWidth() - clip.right;
+	}
+	if (y + src.GetHeight() > clip.bottom)
+	{
+		src.bottom -= y + src.GetHeight() - clip.bottom;
+	}
+	if (x < clip.left)
+	{
+		src.left += clip.left - x;
+		x = clip.left;
+	}
+	if (y < clip.top)
+	{
+		src.top += clip.top - y;
+		y = clip.top;
+	}
+	for (int sy = src.top; sy < src.bottom; sy++)
+	{
+		for (int sx = src.left; sx < src.right; sx++)
+		{
+			const Color c = s.GetPixel(sx, sy);
+			if (c != Colors::Magenta)
+			{
+				PutPixel(x + sx - src.left, y + sy - src.top, s.GetPixel(sx, sy));
+			}
 		}
 	}
 }

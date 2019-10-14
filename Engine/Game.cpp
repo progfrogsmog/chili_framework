@@ -42,5 +42,9 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-	gfx.DrawSprite(100, 100, surf);
+	gfx.DrawSprite(200, 200, surf);
+	gfx.DrawSprite(wnd.mouse.GetPosX() - 16, wnd.mouse.GetPosY() - 24, { 32,64,48,96 }, gfx.GetDimensions(), surf);//left-right top-bottom
+
+	gfx.DrawSpriteNoneChromo(200, 200, surf);
+	gfx.DrawSpriteNoneChromo(wnd.mouse.GetPosX()-16, wnd.mouse.GetPosY()-24, { 32,64,48,96 }, gfx.GetDimensions(), surf);//left-right top-bottom
 }

@@ -122,3 +122,8 @@ Color Surface::GetPixel(int x, int y) const
 {
 	return pPixel[x + y * width];
 }
+
+RectI Surface::GetRect() const
+{
+	return {0,width,0,height};
+}
